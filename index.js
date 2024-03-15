@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+
 const fs = require('fs');
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
@@ -13,48 +14,54 @@ const PORT = 3000;
 
 app.use(bodyParser.json());
 
+// GET method route
+app.get('/hi', (req, res) => {
+  res.send('GET request to the homepage')
+})
+
 // Endpoint to handle fraud detection
 app.post('/detect-fraud', async (req, res) => {
-  const { emailContent } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  res.send('POST request to the homepage 2')
+//   const { emailContent } = req.body;
+//   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-  const chatModel = new ChatOpenAI({
-    openAIApiKey: OPENAI_API_KEY,
-  });
+//   const chatModel = new ChatOpenAI({
+//     openAIApiKey: OPENAI_API_KEY,
+//   });
 
-  const prompt = ChatPromptTemplate.fromMessages([
-    ["system", "You are a world class technical documentation writer." + fraudDetectionPrompt],
-    ["user", emailContent],
-  ]);
+//   const prompt = ChatPromptTemplate.fromMessages([
+//     ["system", "You are a world class technical documentation writer." + fraudDetectionPrompt],
+//     ["user", emailContent],
+//   ]);
 
-  const outputParser = new StringOutputParser();
+//   const outputParser = new StringOutputParser();
 
-  const llmChain = prompt.pipe(chatModel).pipe(outputParser);
+//   const llmChain = prompt.pipe(chatModel).pipe(outputParser);
 
-  try {
-    const response = await llmChain.invoke();
-    console.log("Response from language model:", response);
+//   try {
+//     const response = await llmChain.invoke();
+//     console.log("Response from language model:", response);
 
-    let fraudDetected = 0; // Initialize variable to store fraud detection result
+//     let fraudDetected = 0; // Initialize variable to store fraud detection result
 
-    // Review response, set fraudDetected to 1 if keyword "fraud" is found
-    if (response.toLowerCase().includes("fraud")) {
-        console.log("Potential fraud detected.");
-        fraudDetected = 1;
-    } else {
-        console.log("No fraud detected.");
-        fraudDetected = 0;
-    }
+//     // Review response, set fraudDetected to 1 if keyword "fraud" is found
+//     if (response.toLowerCase().includes("fraud")) {
+//         console.log("Potential fraud detected.");
+//         fraudDetected = 1;
+//     } else {
+//         console.log("No fraud detected.");
+//         fraudDetected = 0;
+//     }
 
-    res.json({ fraudDetected });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
-  }
-});
+//     res.json({ fraudDetected });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
 });
 
 // Testing
