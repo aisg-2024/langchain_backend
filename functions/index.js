@@ -1,13 +1,32 @@
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
+const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+
+// Create and deploy your first functions
+// https://firebase.google.com/docs/functions/get-started
+
+// exports.helloWorld = onRequest((request, response) => {
+//   logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-
 const fs = require('fs');
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
-
 const fraudDetectionPrompt = require('./fraudDetectionPrompt');
+const functions = require("firebase-functions")
 
 const app = express();
 const PORT = 3000;
@@ -17,7 +36,7 @@ app.use(bodyParser.json());
 // Endpoint to handle fraud detection
 app.post('/detect-fraud', async (req, res) => {
   const { emailContent } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  const OPENAI_API_KEY = functions.config().openai.api_key;
 
   const chatModel = new ChatOpenAI({
     openAIApiKey: OPENAI_API_KEY,
@@ -64,3 +83,5 @@ app.listen(PORT, () => {
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
+
+exports.api = functions.https.onRequest(app)
