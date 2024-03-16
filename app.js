@@ -9,7 +9,6 @@ const { StringOutputParser } = require("@langchain/core/output_parsers");
 const fraudDetectionPrompt = require('./fraudDetectionPrompt');
 require('dotenv').config()
 
-
 const app = express();
 const PORT = 3000;
 
