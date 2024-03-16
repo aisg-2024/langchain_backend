@@ -1,0 +1,23 @@
+{
+  "name": "webhook-server",
+  "description": "A sample webhook server using Node.js and Express.",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@langchain/community": "^0.0.36",
+    "@langchain/core": "^0.1.44",
+    "@langchain/openai": "^0.0.19",
+    "axios": "^1.6.7",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "i": "^0.3.7",
+    "langchain": "^0.1.26"
+  },
+  "private": true
+}
