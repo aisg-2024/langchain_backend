@@ -7,10 +7,11 @@ const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
 const fraudDetectionPrompt = require('./fraudDetectionPrompt');
+require('dotenv').config()
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.use(bodyParser.json());
 app.use(cors({ origin: true }));
@@ -65,5 +66,3 @@ app.listen(PORT, () => {
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
-
-exports.api = functions.https.onRequest(app)
