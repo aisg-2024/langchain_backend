@@ -12,8 +12,8 @@ require('dotenv').config()
 const app = express();
 const PORT = 3000;
 
-app.use(bodyParser.json());
 app.use(cors({ origin: true }));
+app.use(bodyParser.json());
 
 // Endpoint to handle fraud detection
 app.post('/detect-fraud', async (req, res) => {
