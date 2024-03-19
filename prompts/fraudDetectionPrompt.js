@@ -1,5 +1,5 @@
 const fraudDetectionPrompt = `
-  prompt: Detect and flag any potential fraud elements within the given email in an ordered manner:
+  Detect and flag any potential fraud elements within the given email in an ordered manner:
 
   fraud_elements:
   - Unrealistic Demands/Threats:

@@ -14,6 +14,7 @@ async function detectFraudInEmail(emailContent) {
     // Initialize the OpenAI model with the API key
     const chatModel = new ChatOpenAI({
         openAIApiKey: OPENAI_API_KEY,
+        model: 'gpt-3.5-turbo'
     });
 
     // Prepare the prompt with the system and user messages
