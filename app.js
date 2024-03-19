@@ -1,67 +1,35 @@
+// Import required modules and libraries
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
-const fs = require('fs');
 const cors = require("cors");
-const { ChatOpenAI } = require("@langchain/openai");
-const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const { StringOutputParser } = require("@langchain/core/output_parsers");
-const fraudDetectionPrompt = require('./fraudDetectionPrompt');
+const { detectFraudInEmail } = require('./utils/detectFraud');
 require('dotenv').config()
 
+// Initialize Express application
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Port number for the server to listen on
 
-app.use(cors({ origin: true }));
-app.use(bodyParser.json());
+// Middleware setup
+app.use(cors({ origin: true })); // Enable all CORS requests
+app.use(bodyParser.json()); // Use bodyParser to parse JSON request bodies
 
-// Endpoint to handle fraud detection
-app.post('/detect-fraud', async (req, res) => {
-  const { emailContent } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-  const chatModel = new ChatOpenAI({
-    openAIApiKey: OPENAI_API_KEY,
-  });
-
-  // Update the prompt creation in the '/detect-fraud' endpoint
-  const prompt = ChatPromptTemplate.fromMessages([
-      ["system", "You are a world class technical documentation writer." + fraudDetectionPrompt],
-      ["user", emailContent],
-  ]);
-
-  const outputParser = new StringOutputParser();
-
-  const llmChain = prompt.pipe(chatModel).pipe(outputParser);
-
+// Endpoint to detect fraud
+app.post('/detect-fraud', async (req, res, next) => {
   try {
-    const response = await llmChain.invoke();
-    console.log("Response from language model:", response);
-
-    let fraudDetected = 0; // Initialize variable to store fraud detection result
-
-    // Review response, set fraudDetected to 1 if keyword "fraud" is found
-    if (response.toLowerCase().includes("fraud")) {
-        console.log("Potential fraud detected.");
-        fraudDetected = 1;
-    } else {
-        console.log("No fraud detected.");
-        fraudDetected = 0;
-    }
-
-    res.json({ response: response, fraudDetected });
-
+    const { emailContent } = req.body;
+    const result = await detectFraudInEmail(emailContent);
+    res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred' });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// Testing
+// Testing endpoint to ensure the server is running
 app.get('/', (req, res) => {
   res.send('Hello, World!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
