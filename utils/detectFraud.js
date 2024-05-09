@@ -22,7 +22,7 @@ const extractionFunctionSchema = {
       },
       phishing_score: {
         type: "number",
-        description: "phishing risk confidence score as an integer on a scale from 0 to 10.",
+        description: "phishing risk confidence score as an integer on a scale from 0 to 10,  0 to 5 means legitimate, 6 to 10 means phishing",
       },
       brand_impersonation: {
         type: "string",
