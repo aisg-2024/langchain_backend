@@ -14,12 +14,11 @@ const researchPromptSplitJSON = `
   1. Examine the email header for spoofing signs where there are
   domain discrepancies between the "Received:" field and the other 
   fields. Domain discrepancies refer to when there are no overlaps in the domains of the addresses.
-  Take note that domains can be legitimate as long as they contain an official name. a domain need
-  not be be fully consisted of an official name, such as in 'scoutcamp.bounces.google.com'. 
+  Take note that complex domains can be legitimate as long as they contain an official name. For example,
+  'scoutcamp.bounces.google.com' is a valid domain as it contains 'google.com', an official name.
   Evaluate the "Subject:" for typical phishing characteristics
-  (e.g., urgency, promise of reward). Check if the "From:", "Reply To:" or
-  "Return Path:" address has been replaced with a dummy address that
-  does not use a standard domain format.
+  (e.g., urgency, promise of reward). Check if the "From:" or "Reply To:" address has been 
+  replaced with a dummy address that does not use a standard domain format.
   2. Analyze the email body for social engineering tactics designed to
   induce clicks on hyperlinks. Inspect URLs to determine if they are
   misleading or lead to suspicious websites. Normally, such URLs will have
