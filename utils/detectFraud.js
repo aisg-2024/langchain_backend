@@ -24,20 +24,12 @@ const extractionFunctionSchema = {
         type: "number",
         description: "phishing risk confidence score as an integer on a scale from 0 to 10,  0 to 5 means legitimate, 6 to 10 means phishing",
       },
-      brand_impersonation: {
-        type: "string",
-        description: "brand name associated with the email, if applicable.",
-      },
       rationale: {
         type: "string",
         description: "detailed rationales for the determination, up to 500 words.",
       },
-      brief_rationale: {
-        type: "string",
-        description: "brief reason for the determination.",
-      }
     },
-    required: ["is_phishing", "phishing_score", "brand_impersonation", "rationale", "brief_rationale"],
+    required: ["is_phishing", "phishing_score", "rationale"],
   },
 };
 

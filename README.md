@@ -56,8 +56,9 @@ Request Example
 Response Example
 ```
 {
-  "response": "Detailed response from OpenAI model...",
-  "fraudDetected": 1
+    "fraudDetected": 1,
+    "phishing_score": 8,
+    "result_rationale": "The email exhibits multiple characteristics of a phishing email. The subject line creates a sense of urgency, a common tactic used in phishing emails. The email requests personal information through a suspicious link, which is a strong indication of phishing. There are no specific details to verify the legitimacy of the sender. The urgency and fear of loss are heightened, pressuring the recipient to act quickly without providing any evidence of the account compromise. The use of a non-standard domain name for the link 'maliciouslink.com' is another alarming sign of phishing."
 }
 ```
 
@@ -71,15 +72,6 @@ Runtime: Node
 Build Command: yarn
 Start Command: node app.js
 
-## Testing
-A simple endpoint to ensure the server is running can be accessed via:
-
-```
-GET /
-```
-Which will return a 'Hello, World!' message.
-
-<br>
 
 # Fraud Detection Prompt Explanation
 
@@ -87,10 +79,10 @@ This section explains the criteria and methodology used to detect and flag poten
 
 ## Prompting Techniques
 
-Making use of few-shot prompting to provide greater context:
+Making use of Chain-Of-Thought prompting to provide greater context:
 
-[Prompt Engineering](https://www.promptingguide.ai/techniques/fewshot)
-> While large-language models demonstrate remarkable zero-shot capabilities, they still fall short on more complex tasks when using the zero-shot setting. Few-shot prompting can be used as a technique to enable in-context learning where we provide demonstrations in the prompt to steer the model to better performance. The demonstrations serve as conditioning for subsequent examples where we would like the model to generate a response. According to Touvron et al. 2023 few shot properties first appeared when models were scaled to a sufficient size (Kaplan et al., 2020).
+[Prompt Engineering](https://www.promptingguide.ai/techniques/cot)
+> Introduced in Wei et al. (2022), chain-of-thought (CoT) prompting enables complex reasoning capabilities through intermediate reasoning steps. You can combine it with few-shot prompting to get better results on more complex tasks that require reasoning before responding.
 
 In the context of our prompt, we made sure to spell out what sort of fraud elements can exist within an email as described below.
 
@@ -150,6 +142,62 @@ Each of these elements on their own or in combination can indicate fraudulent in
 
 ### 12. Binary Outcome Suggestion
 Finally, the prompt suggests a binary outcome – marking an email as either fraudulent or clean. This simplification of outcomes facilitates decision-making processes, whether automated by a system or conducted manually by a user.
+
+## Final Prompt
+In our finalised prompt, we decide to make these fraud elements more concise and implicit within our prompt.
+
+```
+You are a cybersecurity expert who specialises in identifying phishing emails with 100% accuracy. You fully understand the elements of a malicious phishing email. You also understand how to use email context to distinguish between a truly malicious email and a legitimate email containing elements of malicious emails. I want you to determine whether a given email is a phishing email or a legitimate email. Your analysis must be based on clear evidence.
+
+Phishing emails often impersonate known brands and use social engineering techniques to deceive users. These techniques include, but are not limited to: rewards that are too good to be true, fake warnings about account problems, and creating a sense of urgency or interest. Spoofing the sender address and embedding deceptive HTML links are also common tactics.
+ Analyze the email by following these steps:
+ 1. Examine the email header for spoofing signs where there are domain discrepancies between the "Received:" field and the other fields. Domain discrepancies refer to when there are no overlaps in the domains of the addresses. Take note that complex domains can be legitimate as long as they contain an official name. For example, 'scoutcamp.bounces.google.com' is a valid domain as it contains 'google.com', an official name. Evaluate the "Subject:" for typical phishing characteristics (e.g., urgency, promise of reward). Check if the "From:" or "Reply To:" address has been replaced with a dummy address that does not use a standard domain format.
+ 2. Analyze the email body for social engineering tactics designed to induce clicks on hyperlinks. Inspect URLs to determine if they are misleading or lead to suspicious websites. Normally, such URLs will have suspicious domains.
+ 3. Identify any impersonation of well-known brands where the email addresses in the email do not contain or contain augmented versions of the actual brand name.
+ 4. Be on the lookout for spelling and grammatical errors, and illogical characters in the email contents, the higher the frequency of these errors the higher chance it has of being a phishing email.
+ 5. Provide a comprehensive evaluation of the email, highlighting specific elements that support your conclusion. Include a detailed explanation of any phishing or legitimacy indicators found in the email. Cite concrete examples.
+ 6. Summarize your findings and provide your final verdict on the legitimacy of the email, supported by the evidence you gathered.
+
+```
+
+## JSON Output Parser (LangChain)
+To output the response directly from the LLM as a JSON, we made use of the [JSON output parser (LangChain)](https://js.langchain.com/docs/modules/model_io/output_parsers/types/json_functions) with the relevant fields:
+- is_phishing (boolean string)
+- phishing_score (number)
+- rationale (string)
+
+This is in line with Explainable artificial intelligence (XAI), which allows human users to comprehend and trust the results and output created by machine learning algorithms.
+
+```python
+// Instantiate the parser
+const parser = new JsonOutputFunctionsParser();
+
+// Define the function schema
+const extractionFunctionSchema = {
+  name: "extractor",
+  description: "Extracts fields from the input.",
+  parameters: {
+    type: "object",
+    properties: {
+      is_phishing: {
+        type: "string",
+        enum: ["true", "false"],
+        description: "a boolean value indicating whether the email is phishing (true) or legitimate (false).",
+      },
+      phishing_score: {
+        type: "number",
+        description: "phishing risk confidence score as an integer on a scale from 0 to 10,  0 to 5 means legitimate, 6 to 10 means phishing",
+      },
+      rationale: {
+        type: "string",
+        description: "detailed rationales for the determination, up to 500 words.",
+      },
+    },
+    required: ["is_phishing", "phishing_score", "rationale"],
+  },
+};
+```
+
 
 ## License
 This project is open-sourced under the MIT license. See the LICENSE file for more information.
